@@ -6,31 +6,44 @@
 #include "../../Development/tile.h"
 #include "../../Development/level.h"
 #include "../../Development/geometry.h"
+using namespace std;
 
 // constants
 const int SCREEN_W = 600;
 const int SCREEN_H = 600;
-const int X = 2;
-const int Y = 3;
+const int X = 21;
+const int Y = 13;
+
+#define GREEN 0x4caf50
+#define LIGHT_GREEN 0x8bc34a
+#define RED 0xf44336
+#define DARK_ORANGE 0xff5722
+#define ORANGE 0xff9800
+#define DARK_YELLOW 0xffc107
+#define YELLOW 0xffeb3b
+#define BLACK 0
+#define WHITE 0xffffff
+#define BLUE 0x03a9f4
+#define NUM_COLORS 11
 
 enum Color {
-	Green = 0x4caf50,
-	LightGreen = 0x8bc34a,
-	YellowGreen = 0xcddc39,
-	Red = 0xf44336,
-	DarkOrange = 0xff5722,
-	Orange = 0xff9800,
-	DarkYellow = 0xffc107,
-	Yellow = 0xffeb3b,
-	Black = 0,
-	White = 0xffffff,
-	Blue = 0x03a9f4
+	Green,
+	LightGreen,
+	YellowGreen,
+	Red,
+	DarkOrange,
+	Orange,
+	DarkYellow,
+	Yellow,
+	Black,
+	White,
+	Blue
 };
 
 struct Render {
-	Point tileSize;
-	Point viewport;
-	Point start;
+	Pointd tileSize;
+	Pointi viewport;
+	Pointi viewportStart;
 };
 
 Level level(X, Y);
@@ -45,25 +58,25 @@ void initLevel() {
 }
 
 void initRender() {
-	float maxTileW, maxTileH;
+	double maxTileW, maxTileH;
 
-	render.tileSize.x = 1 / level.numTiles.x;
-	render.tileSize.y = 1 / level.numTiles.y;
+	render.tileSize.x = 1.0 / level.numTiles.x;
+	render.tileSize.y = 1.0 / level.numTiles.y;
 
 	maxTileW = SCREEN_W / level.numTiles.x;
 	maxTileH = SCREEN_H / level.numTiles.y;
 
 	if (maxTileW > maxTileH) {
-		render.viewport.x = maxTileH * level.numTiles.x;
+		render.viewport.x = (int)(maxTileH * level.numTiles.x);
 		render.viewport.y = SCREEN_H;
-		render.start.x = (SCREEN_W - render.viewport.x) / 2;
-		render.start.y = 0;
+		render.viewportStart.x = (SCREEN_W - render.viewport.x) / 2;
+		render.viewportStart.y = 0;
 	}
 	else {
 		render.viewport.x = SCREEN_W;
-		render.viewport.y = maxTileW * level.numTiles.y;
-		render.start.x = 0;
-		render.start.y = (SCREEN_H - render.viewport.y) / 2;
+		render.viewport.y = (int)(maxTileW * level.numTiles.y);
+		render.viewportStart.x = 0;
+		render.viewportStart.y = (SCREEN_H - render.viewport.y) / 2;
 	}
 }
 
@@ -75,7 +88,7 @@ void myInit(void) {
 	glLineWidth(1);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluOrtho2D(1, 0, 1, 0);
+	gluOrtho2D(0, 1, 1, 0);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -84,23 +97,65 @@ void myInit(void) {
 	initRender();
 }
 
-void hexColor(Color hex) {
-	int intHex = (int)hex;
-	double r = ((intHex >> 16) & 0xff) / 255.0;
-	double g = ((intHex >> 8) & 0xff) / 255.0;
-	double b = (intHex & 0xff) / 255.0;
+int colorToHex(Color color) {
+
+	switch (color) {
+	case Green:
+		return GREEN;
+		break;
+	case LightGreen:
+		return LIGHT_GREEN;
+		break;
+	case Red:
+		return RED;
+		break;
+	case DarkOrange:
+		return DARK_ORANGE;
+		break;
+	case Orange:
+		return ORANGE;
+		break;
+	case DarkYellow:
+		return DARK_YELLOW;
+		break;
+	case Yellow:
+		return YELLOW;
+		break;
+	case Black:
+		return BLACK;
+		break;
+	case White:
+		return WHITE;
+		break;
+	case Blue:
+		return BLUE;
+		break;
+	default:
+		return BLACK;
+		break;
+	}
+}
+
+void setColor(int hex) {
+	double r = ((hex >> 16) & 0xff) / 255.0;
+	double g = ((hex >> 8) & 0xff) / 255.0;
+	double b = (hex & 0xff) / 255.0;
 	glColor3d(r, g, b);
 }
 
-void drawTile(float left, float bottom, Color color) {
-	float right = left + render.tileSize.x;
-	float top = bottom + render.tileSize.y;
-	hexColor(color);
+void setColor(Color color) {
+	setColor(colorToHex(color));
+}
+
+void drawTile(double left, double bottom, Color color) {
+	double right = left + render.tileSize.x;
+	double top = bottom + render.tileSize.y;
+	setColor(color);
 	glBegin(GL_POLYGON);
-	glVertex2f(left, bottom);
-	glVertex2f(right, bottom);
-	glVertex2f(right, top);
-	glVertex2f(left, top);
+	glVertex2d(left, bottom);
+	glVertex2d(right, bottom);
+	glVertex2d(right, top);
+	glVertex2d(left, top);
 	glEnd();
 }
 
@@ -131,7 +186,7 @@ void renderTiles(void) {
 	}
 }
 
-void drawLine(float x1, float y1, float x2, float y2) {
+void drawLine(double x1, double y1, double x2, double y2) {
 	glBegin(GL_LINE_STRIP);
 	glVertex2d(x1, y1);
 	glVertex2d(x2, y2);
@@ -152,7 +207,7 @@ void drawGrid() {
 
 void myDisplay(void) {
 	glClear(GL_COLOR_BUFFER_BIT);
-	glViewport((int) render.start.x, (int) render.start.y, (GLsizei)render.viewport.x, (GLsizei)render.viewport.y);
+	glViewport(render.viewportStart.x, render.viewportStart.y, (GLsizei)render.viewport.x, (GLsizei)render.viewport.y);
 
 	renderTiles();
 
@@ -160,14 +215,48 @@ void myDisplay(void) {
 	glutSwapBuffers();
 }
 
+Pointi getTileIndexFromMousePosition(Pointi mouse) {
+	Pointi shifted;
+	Pointd scaled;
+	Pointi index;
+
+	shifted.x = mouse.x - render.viewportStart.x;
+	shifted.y = mouse.y - render.viewportStart.y;
+
+	scaled.x = 1.0 * shifted.x / render.viewport.x;
+	scaled.y = 1.0 * shifted.y / render.viewport.y;
+
+	index.x = (int)(scaled.x / render.tileSize.x);
+	index.y = (int)(scaled.y / render.tileSize.y);
+
+	return index;
+}
+
+void myMouse(int button, int state, int x, int y) {
+	Pointi index;
+	
+	// left button clicked
+	if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON) {
+		index = getTileIndexFromMousePosition({ x, y });
+		level.tiles[index.x][index.y].tileType = Water;
+		for (int j = 0; j < Y; j++) {
+			for (int i = 0; i < X; i++) {
+				cout << level.tiles[i][j].tileType << " ";
+			}
+			cout << endl;
+		}
+	}
+}
+
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(SCREEN_W, SCREEN_H);
-	glutInitWindowPosition(100, 150);
+	glutInitWindowPosition(300, 150);
 	glutCreateWindow("Render Level 2D");
 
 	glutDisplayFunc(myDisplay);
+	glutMouseFunc(myMouse);
 
 	myInit();
 	glutMainLoop();

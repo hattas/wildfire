@@ -7,14 +7,14 @@
 class Level {
 public:
 	// members
-	Point numTiles;
+	Pointi numTiles;
 	Tile** tiles;
 
 	// constructors
 	Level();
-	Level(Point numTiles);
+	Level(Pointi numTiles);
 	//Level(int numTilesX, int numTilesY);
-	Level(float numTilesX, float numTilesY);
+	Level(int numTilesX, int numTilesY);
 
 	// functions
 };
