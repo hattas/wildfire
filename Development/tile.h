@@ -1,10 +1,13 @@
-enum tileType {
+#ifndef TILE_H
+#define TILE_H
+
+enum TileType {
 	Grass,
 	Water,
 	Fire
 };
 
-enum fireStrength {
+enum FireStrength {
 	none,
 	low,
 	medium,
@@ -12,18 +15,22 @@ enum fireStrength {
 	burnt
 };
 
-class tile
-{
+class Tile {
 public:
-	/*Member Variables*/
+	/* Member Variables */
 	float height;
-	int tileType;
-	int burnLevel;
-	/*constructor*/
-	tile(float height, int tileType);
-	/*Functions*/
-	void burntile(void);
+	TileType tileType;
+	FireStrength burnLevel;
+
+	/* constructor */
+	Tile();
+	Tile(float height, TileType tileType);
+
+	/* Functions */
+	void burnTile(void);
+
 private:
-	/*no private values*/
+	/* no private values */
 };
 
+#endif
