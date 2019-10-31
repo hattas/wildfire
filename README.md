@@ -20,6 +20,13 @@ Project presentations | `12/06` | :x:
 ## TODO
 - [x] Create readme
 - [ ] Create todo section
+- [ ] Make level class (Russell)
+- [ ] Make tile class (Paula)
+- [ ] Make code to render a level (John)
+  - [ ] 2D
+  - [ ] 3D
+- [ ] Level schema
+- [ ] Code to read in level files
 
 ## Example file structure of the solution/repository
 All projects can be contained in the same solution in order to easily switch between them.
