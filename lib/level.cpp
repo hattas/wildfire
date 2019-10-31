@@ -5,14 +5,14 @@ Level::Level() {
 	Level(0, 0);
 }
 
-Level::Level(Pointi numTiles) {
-	Level::Level(numTiles.x, numTiles.y);
+Level::Level(Point numTiles) {
+	Level::Level((int)numTiles.x, (int)numTiles.y);
 }
 
 Level::Level(int numTilesX, int numTilesY) {
-	numTiles = { numTilesX, numTilesY };
-	Tile** tiles = new Tile * [numTiles.x];
+	numTiles = { (double)numTilesX, (double)numTilesY };
+	Tile** tiles = new Tile * [(int)numTiles.x];
 	for (int i = 0; i < numTiles.x; i++)
-		tiles[i] = new Tile[numTiles.y];
+		tiles[i] = new Tile[(int)numTiles.y];
 	this->tiles = tiles;
 }

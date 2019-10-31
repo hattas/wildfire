@@ -3,16 +3,16 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 #include <iostream>
-#include "../../Development/tile.h"
-#include "../../Development/level.h"
-#include "../../Development/geometry.h"
+#include "lib/tile.h"
+#include "lib/level.h"
+#include "lib/geometry.h"
 using namespace std;
 
 // constants
 const int SCREEN_W = 600;
 const int SCREEN_H = 600;
-const int X = 21;
-const int Y = 13;
+const int X = 8;
+const int Y = 8;
 
 #define GREEN 0x4caf50
 #define LIGHT_GREEN 0x8bc34a
@@ -41,9 +41,9 @@ enum Color {
 };
 
 struct Render {
-	Pointd tileSize;
-	Pointi viewport;
-	Pointi viewportStart;
+	Point tileSize;
+	Point viewport;
+	Point viewportStart;
 };
 
 Level level(X, Y);
@@ -60,8 +60,7 @@ void initLevel() {
 void initRender() {
 	double maxTileW, maxTileH;
 
-	render.tileSize.x = 1.0 / level.numTiles.x;
-	render.tileSize.y = 1.0 / level.numTiles.y;
+	render.tileSize = 1.0 / level.numTiles;
 
 	maxTileW = SCREEN_W / level.numTiles.x;
 	maxTileH = SCREEN_H / level.numTiles.y;
@@ -207,7 +206,7 @@ void drawGrid() {
 
 void myDisplay(void) {
 	glClear(GL_COLOR_BUFFER_BIT);
-	glViewport(render.viewportStart.x, render.viewportStart.y, (GLsizei)render.viewport.x, (GLsizei)render.viewport.y);
+	glViewport((int)render.viewportStart.x, (int)render.viewportStart.y, (GLsizei)render.viewport.x, (GLsizei)render.viewport.y);
 
 	renderTiles();
 
@@ -215,36 +214,28 @@ void myDisplay(void) {
 	glutSwapBuffers();
 }
 
-Pointi getTileIndexFromMousePosition(Pointi mouse) {
-	Pointi shifted;
-	Pointd scaled;
-	Pointi index;
+Point getTileIndexFromMousePosition(Point mouse) {
+	Point shifted;
+	Point scaled;
+	Point index;
 
-	shifted.x = mouse.x - render.viewportStart.x;
-	shifted.y = mouse.y - render.viewportStart.y;
+	shifted = mouse - render.viewportStart;
+	scaled = 1.0 * shifted / render.viewport;
+	index = scaled / render.tileSize;
+	index = index.floor();
 
-	scaled.x = 1.0 * shifted.x / render.viewport.x;
-	scaled.y = 1.0 * shifted.y / render.viewport.y;
-
-	index.x = (int)(scaled.x / render.tileSize.x);
-	index.y = (int)(scaled.y / render.tileSize.y);
+	cout << index << endl;
 
 	return index;
 }
 
 void myMouse(int button, int state, int x, int y) {
-	Pointi index;
-	
+	Point index;
+
 	// left button clicked
 	if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON) {
-		index = getTileIndexFromMousePosition({ x, y });
-		level.tiles[index.x][index.y].tileType = Water;
-		for (int j = 0; j < Y; j++) {
-			for (int i = 0; i < X; i++) {
-				cout << level.tiles[i][j].tileType << " ";
-			}
-			cout << endl;
-		}
+		index = getTileIndexFromMousePosition({ (double)x, (double)y });
+		level.tiles[(int)index.x][(int)index.y].tileType = Water;
 	}
 }
 
@@ -252,7 +243,7 @@ int main(int argc, char** argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(SCREEN_W, SCREEN_H);
-	glutInitWindowPosition(300, 150);
+	glutInitWindowPosition(600, 150);
 	glutCreateWindow("Render Level 2D");
 
 	glutDisplayFunc(myDisplay);
