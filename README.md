@@ -20,10 +20,10 @@ Project presentations | `12/06` | :x:
 ## TODO
 - [x] Create readme
 - [ ] Create todo section
-- [ ] Make level class (Russell)
-- [ ] Make tile class (Paula)
-- [ ] Make code to render a level (John)
-  - [ ] 2D
+- [x] Make level class
+- [x] Make tile class
+- [x] Make code to render a level
+  - [x] 2D
   - [ ] 3D
 - [ ] Level schema
 - [ ] Code to read in level files
@@ -41,15 +41,13 @@ All projects must be contained in a subfolder to stay organized.
     ├── demo
     │   ├── FireDemo1
     │   │   ├── Source.cpp
-    │   ├── FireDemo2
+    │   ├── Render2D
     │   │   ├── Source.cpp
-    │   └── TileDemo1
-    │   │   ├── Source.cpp
-    ├── test
-    │   ├── FireTest1
-    │   │   ├── Source.cpp
-    │   ├── UnitTest1
-    │   │   ├── Source.cpp
+    ├── Development           # files to include
+    │   ├── tile.cpp
+    │   ├── tile.h
+    │   ├── level.cpp
+    │   ├── level.h
     └── ...
 
 ## Creating the solution for the first time
