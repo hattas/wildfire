@@ -1,5 +1,6 @@
 #include "level.h"
 #include "tile.h"
+#include "point.h"
 
 Level::Level() {
 	Level(0, 0);

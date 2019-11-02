@@ -5,7 +5,7 @@
 #include <iostream>
 #include "lib/tile.h"
 #include "lib/level.h"
-#include "lib/geometry.h"
+#include "lib/point.h"
 using namespace std;
 
 // constants

@@ -1,13 +1,4 @@
-#include "geometry.h"
-
-
-/*
-template <typename T>
-std::ostream& operator<< (std::ostream& out, Point<int> const& point) {
-	out << "(" << point.x << ", " << point.y << ")";
-	return out;
-}
-*/
+#include "point.h"
 
 Point::Point() {
 	this->x = 0;

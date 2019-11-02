@@ -2,7 +2,7 @@
 #define LEVEL_H
 
 #include "tile.h"
-#include "geometry.h"
+#include "point.h"
 
 class Level {
 public:
