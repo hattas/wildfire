@@ -3,6 +3,12 @@
 #include "tile.h"
 #include "point.h"
 
+enum class UnitType {
+	truck,
+	heli,
+	boat
+};
+
 class Level {
 public:
 	
@@ -15,4 +21,9 @@ public:
 	Level(int numTilesX, int numTilesY);
 
 	// functions
+	bool isGameLost();
+	bool isGameWon();
+	bool placeUnit(UnitType unit, int x, int y, int rotation);
+	void spreadWater();
+	void spreadFire();
 };
