@@ -6,25 +6,14 @@
 #include "lib/tile.h"
 #include "lib/level.h"
 #include "lib/point.h"
+#include "lib/color.h"
 using namespace std;
 
 // constants
 const int SCREEN_W = 600;
 const int SCREEN_H = 400;
-const int X = 5;
-const int Y = 10;
-
-#define GREEN 0x4caf50
-#define LIGHT_GREEN 0x8bc34a
-#define RED 0xf44336
-#define DARK_ORANGE 0xff5722
-#define ORANGE 0xff9800
-#define DARK_YELLOW 0xffc107
-#define YELLOW 0xffeb3b
-#define BLACK 0
-#define WHITE 0xffffff
-#define BLUE 0x03a9f4
-#define NUM_COLORS 11
+const int X = 30;
+const int Y = 30;
 
 struct Render {
 	Point tileSize;
@@ -38,9 +27,18 @@ Render render;
 void initLevel() {
 	for (int i = 0; i < X; i++) {
 		for (int j = 0; j < Y; j++) {
-			level.tiles[i][j].tileType = Grass;
+			level.tiles[i][j].tileType = TileType::grass;
 		}
 	}
+
+	level.placeUnit(UnitType::truck, { 4, 7 }, { 1, 0 });
+	level.placeUnit(UnitType::truck, { 20, 4 }, { 0, 1 });
+	level.placeUnit(UnitType::truck, { 22, 25 }, { 0, -1 });
+	level.placeUnit(UnitType::truck, { 15, 25 }, { -1, 0 });
+
+	level.placeUnit(UnitType::heli, { 15, 15 }, { -1, 0 });
+
+	level.placeUnit(UnitType::boat, { 4, 15 }, { 1, 0 });
 }
 
 void initRender() {
@@ -78,18 +76,20 @@ void myInit(void) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	initLevel();
-
 	initRender();
 }
 
-void setColor(int hex) {
+void setColor(Color color) {
+	int hex = (int)color;
 	double r = ((hex >> 16) & 0xff) / 255.0;
 	double g = ((hex >> 8) & 0xff) / 255.0;
 	double b = (hex & 0xff) / 255.0;
 	glColor3d(r, g, b);
 }
 
-void drawTile(double left, double bottom, int color) {
+void drawTile(int i, int j, Color color) {
+	double left = i * render.tileSize.x;
+	double bottom = j * render.tileSize.y;
 	double right = left + render.tileSize.x;
 	double top = bottom + render.tileSize.y;
 	setColor(color);
@@ -101,29 +101,57 @@ void drawTile(double left, double bottom, int color) {
 	glEnd();
 }
 
-int tileTypeToColor(TileType type) {
+Color tileTypeToColor(TileType type) {
 	switch (type) {
-	case Grass:
-		return GREEN;
+	case TileType::grass:
+		return Color::green;
 		break;
-	case Water:
-		return BLUE;
+	case TileType::water:
+		return Color::blue;
 		break;
-	case Fire:
-		return RED;
+	case TileType::fire:
+		return Color::red;
 		break;
 	default:
-		return BLACK;
+		return Color::black;
 		break;
 	}
 }
 
 void renderTiles(void) {
-	int color;
+	Color color;
 	for (int i = 0; i < X; i++) {
 		for (int j = 0; j < Y; j++) {
 			color = tileTypeToColor(level.tiles[i][j].tileType);
-			drawTile(i * render.tileSize.x, j * render.tileSize.y, color);
+			drawTile(i, j, color);
+		}
+	}
+}
+
+void renderUnits(void) {
+	Color color;
+	int u, i, j, iStart, iEnd, jStart, jEnd;
+	Unit unit;
+	for (u = 0; u < level.numUnits; u++) {
+		unit = level.units[u];
+		if (unit.direction.x) {
+			iStart = min(unit.position.x, unit.position.x - unit.size.x * unit.direction.x + unit.direction.x);
+			iEnd = max(unit.position.x, unit.position.x - unit.size.x * unit.direction.x + unit.direction.x);
+			jStart = unit.position.y;
+			jEnd = unit.position.y + unit.size.y - 1;
+		}
+		else {
+			jStart = min(unit.position.y, unit.position.y - unit.size.y * unit.direction.y + unit.direction.y);
+			jEnd = max(unit.position.y, unit.position.y - unit.size.y * unit.direction.y + unit.direction.y);
+			iStart = unit.position.x;
+			iEnd = unit.position.x + unit.size.x - 1;
+		}
+		cout << iStart << " " << iEnd << " " << jStart << " " << jEnd << endl;
+		for (i = iStart; i <= iEnd; i++) {
+			for (j = jStart; j <= jEnd; j++) {
+				color = Color::white;
+				drawTile(i, j, color);
+			}
 		}
 	}
 }
@@ -152,6 +180,7 @@ void myDisplay(void) {
 	glViewport((int)render.viewportStart.x, (int)render.viewportStart.y, (GLsizei)render.viewport.x, (GLsizei)render.viewport.y);
 
 	renderTiles();
+	renderUnits();
 
 	drawGrid();
 	glutSwapBuffers();
@@ -167,7 +196,7 @@ Point getTileIndexFromMousePosition(Point mouse) {
 	index = scaled / render.tileSize;
 	index = index.floor();
 
-	cout << index << endl;
+	//cout << index << endl;
 
 	return index;
 }
@@ -178,7 +207,18 @@ void myMouse(int button, int state, int x, int y) {
 	// left button clicked
 	if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON) {
 		index = getTileIndexFromMousePosition({ (double)x, (double)y });
-		level.tiles[(int)index.x][(int)index.y].tileType = Water;
+		level.tiles[(int)index.x][(int)index.y].tileType = TileType::water;
+	}
+}
+
+
+void myKeyboard(unsigned char theKey, int mouseX, int mouseY) {
+	switch (theKey) {
+	case 's':
+		level.spreadWater();
+		glutPostRedisplay();
+		break;
+	default: break;
 	}
 }
 
@@ -191,6 +231,7 @@ int main(int argc, char** argv) {
 
 	glutDisplayFunc(myDisplay);
 	glutMouseFunc(myMouse);
+	glutKeyboardFunc(myKeyboard);
 
 	myInit();
 	glutMainLoop();

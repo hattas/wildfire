@@ -88,6 +88,9 @@ bool Level::isGameWon() {
 }
 
 bool Level::placeUnit(UnitType unit, Point position, Point direction) {
+	int numWaterDirections = 0;
+	Point waterDirections[8];
+
 	Unit newUnit = Unit(unit, position, direction);
 
 	// TODO: check if unit can be placed
@@ -96,25 +99,63 @@ bool Level::placeUnit(UnitType unit, Point position, Point direction) {
 	// add water that comes out of unit
 	switch (unit) {
 	case UnitType::truck:
+		numWaterDirections = 3;
+		if (direction.x) {
+			waterDirections[0] = { direction.x, -1 };
+			waterDirections[1] = { direction.x, 0 };
+			waterDirections[2] = { direction.x, 1 };
+		}
+		else {
+			waterDirections[0] = { -1, direction.y };
+			waterDirections[1] = { 0, direction.y };
+			waterDirections[2] = { 1, direction.y };
+		}
 		break;
 	case UnitType::boat:
-		
+		numWaterDirections = 8;
+		waterDirections[0] = { -1, 1 };
+		waterDirections[1] = { 0, 1 };
+		waterDirections[2] = { 1, 1 };
+		waterDirections[3] = { 0, -1 };
+		waterDirections[4] = { 1, 0 };
+		waterDirections[5] = { -1, -1 };
+		waterDirections[6] = { -1, 0 };
+		waterDirections[7] = { 1, -1 };
 		break;
 	case UnitType::heli:
-		
+		numWaterDirections = 4;
+		waterDirections[0] = { -1, -1 };
+		waterDirections[1] = { -1, 1 };
+		waterDirections[2] = { 1, -1 };
+		waterDirections[3] = { 1, 1 };
 		break;
 	default:
-		
 		break;
 	}
 
+	for (int i = 0; i < numWaterDirections; i++)
+		placeWater({ position.x + waterDirections[i].x, position.y + waterDirections[i].y }, waterDirections[i]);
 	return true;
 }
 
 bool Level::placeWater(Point position, Point direction) {
 
 	// check if can place water here
+	//std::cout << position << " " << direction << std::endl;
 	water[numWater++] = Water(position, direction);
 
 	return true;
+}
+
+void Level::spreadWater() {
+	int x, y;
+	for (int i = 0; i < numWater; i++) {
+		std::cout << water[i].position << std::endl;
+		x = (int)water[i].position.x;
+		y = (int)water[i].position.y;
+		if (x >= 0 && x < numTiles.x && y >= 0 && y < numTiles.y) {
+			tiles[x][y].tileType = TileType::water;
+			water[i].position = water[i].position + water[i].direction;
+		}
+	}
 }
