@@ -30,8 +30,8 @@ const float TILE_H = 1;
 const float GRID_W = 0.5;
 
 // globals
-int numTilesX = 30;
-int numTilesY = 30;
+int numTilesX = 8;
+int numTilesY = 8;
 Camera* camera;
 const float light_amb[] = { 0.5, 0.5, 0.5, 1.0 };
 const float light_dif[] = { 0.25, 0.25, 0.25, 1.0 };
@@ -58,9 +58,7 @@ Level level(numTilesX, numTilesY);
 void initLevel() {
 	for (int i = 0; i < numTilesX; i++) {
 		for (int j = 0; j < numTilesY; j++) {
-			if (i < 10 && j < 10)
-				level.tiles[i][j].tileType = Water;
-			else if (i % 2 == 0 && j % 3 == 0)
+			if ((i % 2) == (j % 2))
 				level.tiles[i][j].tileType = Fire;
 			else
 				level.tiles[i][j].tileType = Grass;
@@ -174,13 +172,13 @@ void myDisplay(void) {
 
 void set_camera(int position) {
 
-	ex = 0;
-	ey = 10;
-	ez = -40;
+	ex = 10;
+	ey = 3;
+	ez = 10;
 
-	lx = 0;
-	ly = 10;
-	lz = 0;
+	lx = numTilesX * (TILE_W + GRID_W) / 2;
+	ly = 3;
+	lx = numTilesY * (TILE_W + GRID_W) / 2;
 
 	// camera up vector
 	upx = 0;
@@ -214,6 +212,9 @@ void init() {
 
 	doLighting();
 	initLevel();
+
+	glOrtho(-1, 1, -1, 1, -1, 1);
+
 	myDisplay();
 }
 
