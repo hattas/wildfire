@@ -31,6 +31,9 @@ public:
 	Point position;
 	Point direction;
 
+	Water();
+	Water(Point p, Point d);
+
 };
 
 class Level {
@@ -56,6 +59,7 @@ public:
 	bool isGameLost();
 	bool isGameWon();
 	bool placeUnit(UnitType unit, int x, int y, int rotation);
+	bool placeWater(Point position, Point direction);
 	void spreadWater();
 	void spreadFire();
 };

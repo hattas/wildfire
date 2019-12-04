@@ -29,8 +29,16 @@ Unit::Unit(UnitType t, Point p, int r) {
 		size = { 1, 1 };
 		break;
 	}
-	size.x = 1;
-	size.y = 1;
+}
+
+Water::Water() {
+	position = { 0, 0 };
+	direction = { 1, 1 };
+}
+
+Water::Water(Point p, Point d) {
+	position = p;
+	direction = d;
 }
 
 Level::Level() {
@@ -80,6 +88,14 @@ bool Level::placeUnit(UnitType unit, int x, int y, int rotation) {
 
 	// TODO: check if unit can be placed
 	units[numUnits++] = newUnit;
+
+	return true;
+}
+
+bool Level::placeWater(Point position, Point direction) {
+
+	// check if can place water here
+	water[numWater++] = Water(position, direction);
 
 	return true;
 }
