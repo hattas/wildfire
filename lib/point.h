@@ -1,5 +1,4 @@
-#ifndef POINT_H
-#define POINT_H
+#pragma once
 
 #include <iostream>
 
@@ -22,5 +21,3 @@ Point operator*(const double n, const Point& p1);
 Point operator/(const double n, const Point& p1);
 Point operator-(const Point& p1);
 std::ostream& operator<< (std::ostream& out, Point const& p);
-
-#endif
