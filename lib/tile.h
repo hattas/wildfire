@@ -1,5 +1,5 @@
-#ifndef TILE_H
-#define TILE_H
+#ifndef TILE_HEADER
+#define TILE_HEADER
 
 enum TileType {
 	Grass,
