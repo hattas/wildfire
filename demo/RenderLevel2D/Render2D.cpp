@@ -10,9 +10,9 @@
 using namespace std;
 
 // constants
-const int SCREEN_W = 600;
-const int SCREEN_H = 400;
-const int X = 30;
+const int SCREEN_W = 800;
+const int SCREEN_H = 800;
+const int X = 40;
 const int Y = 30;
 
 struct Render {
@@ -209,7 +209,19 @@ void myMouse(int button, int state, int x, int y) {
 	// left button clicked
 	if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON) {
 		index = getTileIndexFromMousePosition({ (double)x, (double)y });
-		level.tiles[(int)index.x][(int)index.y].tileType = TileType::water;
+		if (level.tiles[(int)index.x][(int)index.y].tileType == TileType::water)
+			level.tiles[(int)index.x][(int)index.y].tileType = TileType::grass;
+		else
+			level.tiles[(int)index.x][(int)index.y].tileType = TileType::water;
+	}
+
+	// right button clicked
+	if (state == GLUT_DOWN && button == GLUT_RIGHT_BUTTON) {
+		index = getTileIndexFromMousePosition({ (double)x, (double)y });
+		if (level.tiles[(int)index.x][(int)index.y].tileType == TileType::fire)
+			level.tiles[(int)index.x][(int)index.y].tileType = TileType::grass;
+		else
+			level.tiles[(int)index.x][(int)index.y].tileType = TileType::fire;
 	}
 }
 

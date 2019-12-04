@@ -2,7 +2,7 @@
 #include "tile.h"
 #include "point.h"
 
-const double tileChance = 0.01;
+const double tileChance = 0.04;
 const double emberChance = 0.00001;
 
 Unit::Unit() {
@@ -187,6 +187,9 @@ int Level::checkNeighboringTiles(int i, int j, int range) {
 }
 
 void Level::spreadFire() {
+	int numNeighbors, numNeighborsEmber;
+	double chance, chanceEmber, r, rEmber;
+
 	// copy tiles to base fire spreading off previous state
 	for (int i = 0; i < numTiles.x; i++) {
 		for (int j = 0; j < numTiles.y; j++) {
@@ -194,23 +197,18 @@ void Level::spreadFire() {
 		}
 	}
 
-
 	for (int i = 0; i < numTiles.x; i++) {
 		for (int j = 0; j < numTiles.y; j++) {
 			if (tilesPrev[i][j].tileType == TileType::fire)
 				continue;
-			int numNeighbors = checkNeighboringTiles(i, j, 1);
-			int numNeighborsEmber = checkNeighboringTiles(i, j, 10);
-			double chance = tileChance * numNeighbors;
-			double chanceEmber = emberChance * numNeighborsEmber;
-			double r = (double)rand() / RAND_MAX;
-			if (r < chance && tiles[i][j].tileType != TileType::water) {
-				tiles[i][j].tileType = TileType::fire;
-			}
+			numNeighbors = checkNeighboringTiles(i, j, 1);
+			numNeighborsEmber = checkNeighboringTiles(i, j, 10);
+			chance = tileChance * numNeighbors;
+			chanceEmber = emberChance * numNeighborsEmber;
 			r = (double)rand() / RAND_MAX;
-			if (r < chanceEmber && tiles[i][j].tileType != TileType::water) {
+			rEmber = (double)rand() / RAND_MAX;
+			if ((r < chance || rEmber < chanceEmber) && tiles[i][j].tileType != TileType::water)
 				tiles[i][j].tileType = TileType::fire;
-			}
 		}
 	}
 }
