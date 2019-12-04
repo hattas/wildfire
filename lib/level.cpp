@@ -17,3 +17,25 @@ Level::Level(int numTilesX, int numTilesY) {
 		tiles[i] = new Tile[(int)numTiles.y];
 	this->tiles = tiles;
 }
+
+bool Level::isGameLost() {
+	// check if entire grid is fire
+
+	for (int i = 0; i < numTiles.x; i++)
+		for (int j = 0; j < numTiles.y; j++)
+			if (tiles[i][j].tileType != TileType::fire)
+				return false;
+
+	return true;
+}
+
+bool Level::isGameWon() {
+	// check if entire grid is not fire
+
+	for (int i = 0; i < numTiles.x; i++)
+		for (int j = 0; j < numTiles.y; j++)
+			if (tiles[i][j].tileType == TileType::fire)
+				return false;
+
+	return true;
+}
