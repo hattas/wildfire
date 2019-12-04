@@ -10,9 +10,9 @@ using namespace std;
 
 // constants
 const int SCREEN_W = 600;
-const int SCREEN_H = 600;
-const int X = 8;
-const int Y = 8;
+const int SCREEN_H = 400;
+const int X = 5;
+const int Y = 10;
 
 #define GREEN 0x4caf50
 #define LIGHT_GREEN 0x8bc34a
@@ -25,20 +25,6 @@ const int Y = 8;
 #define WHITE 0xffffff
 #define BLUE 0x03a9f4
 #define NUM_COLORS 11
-
-enum Color {
-	Green,
-	LightGreen,
-	YellowGreen,
-	Red,
-	DarkOrange,
-	Orange,
-	DarkYellow,
-	Yellow,
-	Black,
-	White,
-	Blue
-};
 
 struct Render {
 	Point tileSize;
@@ -96,45 +82,6 @@ void myInit(void) {
 	initRender();
 }
 
-int colorToHex(Color color) {
-
-	switch (color) {
-	case Green:
-		return GREEN;
-		break;
-	case LightGreen:
-		return LIGHT_GREEN;
-		break;
-	case Red:
-		return RED;
-		break;
-	case DarkOrange:
-		return DARK_ORANGE;
-		break;
-	case Orange:
-		return ORANGE;
-		break;
-	case DarkYellow:
-		return DARK_YELLOW;
-		break;
-	case Yellow:
-		return YELLOW;
-		break;
-	case Black:
-		return BLACK;
-		break;
-	case White:
-		return WHITE;
-		break;
-	case Blue:
-		return BLUE;
-		break;
-	default:
-		return BLACK;
-		break;
-	}
-}
-
 void setColor(int hex) {
 	double r = ((hex >> 16) & 0xff) / 255.0;
 	double g = ((hex >> 8) & 0xff) / 255.0;
@@ -142,11 +89,7 @@ void setColor(int hex) {
 	glColor3d(r, g, b);
 }
 
-void setColor(Color color) {
-	setColor(colorToHex(color));
-}
-
-void drawTile(double left, double bottom, Color color) {
+void drawTile(double left, double bottom, int color) {
 	double right = left + render.tileSize.x;
 	double top = bottom + render.tileSize.y;
 	setColor(color);
@@ -158,25 +101,25 @@ void drawTile(double left, double bottom, Color color) {
 	glEnd();
 }
 
-Color tileTypeToColor(TileType type) {
+int tileTypeToColor(TileType type) {
 	switch (type) {
 	case Grass:
-		return Green;
+		return GREEN;
 		break;
 	case Water:
-		return Blue;
+		return BLUE;
 		break;
 	case Fire:
-		return Red;
+		return RED;
 		break;
 	default:
-		return Black;
+		return BLACK;
 		break;
 	}
 }
 
 void renderTiles(void) {
-	Color color;
+	int color;
 	for (int i = 0; i < X; i++) {
 		for (int j = 0; j < Y; j++) {
 			color = tileTypeToColor(level.tiles[i][j].tileType);
