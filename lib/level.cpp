@@ -4,23 +4,27 @@
 
 Unit::Unit() {
 	type = UnitType::truck;
-	position.x = 0;
-	position.y = 0;
-	size.x = 1;
-	size.y = 1;
-	rotation = 0;
+	position = { 0, 0 };
+	size = { 1, 1 };
+	direction = { 0, 0 };
 }
 
-Unit::Unit(UnitType t, Point p, int r) {
-	type = t;
-	position = p;
-	rotation = r;
+Unit::Unit(UnitType type, Point position, Point direction) {
+	this->type = type;
+	this->position = position;
+	this->direction = direction;
 	switch (type) {
 	case UnitType::truck:
-		size = { 1, 3 };
+		if (direction.x)
+			size = { 3, 1 };
+		else
+			size = { 1, 3 };
 		break;
 	case UnitType::boat:
-		size = { 1, 3 };
+		if (direction.x)
+			size = { 3, 1 };
+		else
+			size = { 1, 3 };
 		break;
 	case UnitType::heli:
 		size = { 2, 2 };
@@ -36,9 +40,9 @@ Water::Water() {
 	direction = { 1, 1 };
 }
 
-Water::Water(Point p, Point d) {
-	position = p;
-	direction = d;
+Water::Water(Point position, Point direction) {
+	this->position = position;
+	this->direction = direction;
 }
 
 Level::Level() {
@@ -83,11 +87,26 @@ bool Level::isGameWon() {
 	return true;
 }
 
-bool Level::placeUnit(UnitType unit, int x, int y, int rotation) {
-	Unit newUnit = Unit(unit, { (double)x, (double)y }, rotation);
+bool Level::placeUnit(UnitType unit, Point position, Point direction) {
+	Unit newUnit = Unit(unit, position, direction);
 
 	// TODO: check if unit can be placed
 	units[numUnits++] = newUnit;
+
+	// add water that comes out of unit
+	switch (unit) {
+	case UnitType::truck:
+		break;
+	case UnitType::boat:
+		
+		break;
+	case UnitType::heli:
+		
+		break;
+	default:
+		
+		break;
+	}
 
 	return true;
 }

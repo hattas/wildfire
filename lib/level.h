@@ -18,10 +18,10 @@ public:
 	UnitType type;
 	Point position;
 	Point size;
-	int rotation;
+	Point direction;
 
 	Unit();
-	Unit(UnitType t, Point p, int r);
+	Unit(UnitType type, Point position, Point direction);
 
 };
 
@@ -32,7 +32,7 @@ public:
 	Point direction;
 
 	Water();
-	Water(Point p, Point d);
+	Water(Point position, Point direction);
 
 };
 
@@ -58,7 +58,7 @@ public:
 	// functions
 	bool isGameLost();
 	bool isGameWon();
-	bool placeUnit(UnitType unit, int x, int y, int rotation);
+	bool placeUnit(UnitType unit, Point position, Point direction);
 	bool placeWater(Point position, Point direction);
 	void spreadWater();
 	void spreadFire();
