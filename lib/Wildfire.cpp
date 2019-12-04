@@ -122,7 +122,11 @@ void drawGrid() {
 void myMouse(int button, int state, int x, int y) {
 	if (state == GLUT_DOWN) {
 		if (button == GLUT_LEFT_BUTTON)
-			glutPostRedisplay();
+			switch (gameState) {
+			case(START_PAGE): gameState = startPageClick(button, x, y); cout << gameState << endl; break;
+				case(HOW_TO_PLAY): break;
+				case(PLAY_GAME): break;
+			}
 	}
 }
 
@@ -189,13 +193,24 @@ void myKeyboard(unsigned char theKey, int mouseX, int mouseY) {
 
 void myDisplay(void) {
 	glClear(GL_COLOR_BUFFER_BIT);
-	renderTiles();
-	drawGrid();
-	homeScreen();
-	glutSwapBuffers();
+	cout << gameState << endl;
+	switch (gameState) {
+	case(START_PAGE): renderTiles(); drawGrid(); homeScreen(); glutSwapBuffers(); break;
+	case(HOW_TO_PLAY): renderTiles(); drawGrid(); homeScreen(); glutSwapBuffers(); break;
+	case(PLAY_GAME): break;
+	}
+}
+
+void idleEvents(void) {
+	switch (gameState) {
+		case(START_PAGE): startPageIdle(); break;
+		case(HOW_TO_PLAY): break;
+		case(PLAY_GAME): break;
+	}
 }
 
 int main(int argc, char** argv) {
+	gameState = 1;
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -206,7 +221,8 @@ int main(int argc, char** argv) {
 	glutDisplayFunc(myDisplay);
 	glutMouseFunc(myMouse);
 	glutKeyboardFunc(myKeyboard);
-
+	glutIdleFunc(idleEvents);
 	myInit();
+	
 	glutMainLoop();
 }

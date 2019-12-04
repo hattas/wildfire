@@ -1,5 +1,5 @@
 #include "utils.h"
-
+extern int gameState(1);
 Color White = { {255}, {255}, {255} };
 Color Blue = { {56}, {96}, {255} };
 Color Black = { {0}, {0}, {0} };
@@ -11,6 +11,7 @@ Color DarkOrange = { {255}, {87}, {34} };
 Color Orange = { {255}, {152}, {0} };
 Color DarkYellow = { {255}, {193}, {7} };
 Color Yellow = { {255}, {235}, {59} };
+Color Gray = { {158}, {151}, {150} };
 
 void drawString(void* font, const char input[], int x, int y, int n) {
 	int i;
