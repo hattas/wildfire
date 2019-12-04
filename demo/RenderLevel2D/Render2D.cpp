@@ -31,6 +31,8 @@ void initLevel() {
 		}
 	}
 
+	level.tiles[10][10].tileType = TileType::fire;
+
 	level.placeUnit(UnitType::truck, { 4, 7 }, { 1, 0 });
 	level.placeUnit(UnitType::truck, { 20, 4 }, { 0, 1 });
 	level.placeUnit(UnitType::truck, { 22, 25 }, { 0, -1 });
@@ -216,6 +218,10 @@ void myKeyboard(unsigned char theKey, int mouseX, int mouseY) {
 	switch (theKey) {
 	case 's':
 		level.spreadWater();
+		glutPostRedisplay();
+		break;
+	case 'f':
+		level.spreadFire();
 		glutPostRedisplay();
 		break;
 	default: break;

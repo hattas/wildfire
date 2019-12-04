@@ -2,6 +2,9 @@
 #include "tile.h"
 #include "point.h"
 
+const double tileChance = 0.01;
+const double emberChance = 0.00001;
+
 Unit::Unit() {
 	type = UnitType::truck;
 	position = { 0, 0 };
@@ -55,10 +58,17 @@ Level::Level(Point numTiles) {
 
 Level::Level(int numTilesX, int numTilesY) {
 	numTiles = { (double)numTilesX, (double)numTilesY };
+
+	// initialize 2d tile arrays
 	Tile** tiles = new Tile * [(int)numTiles.x];
 	for (int i = 0; i < numTiles.x; i++)
 		tiles[i] = new Tile[(int)numTiles.y];
 	this->tiles = tiles;
+
+	Tile** tilesPrev = new Tile * [(int)numTiles.x];
+	for (int i = 0; i < numTiles.x; i++)
+		tilesPrev[i] = new Tile[(int)numTiles.y];
+	this->tilesPrev = tiles;
 
 	numUnits = 0;
 	numWater = 0;
@@ -156,6 +166,51 @@ void Level::spreadWater() {
 		if (x >= 0 && x < numTiles.x && y >= 0 && y < numTiles.y) {
 			tiles[x][y].tileType = TileType::water;
 			water[i].position = water[i].position + water[i].direction;
+		}
+	}
+}
+
+int Level::checkNeighboringTiles(int i, int j, int range) {
+	int count = 0;
+	for (int k = i - range; k <= i + range; k++) {
+		if (k < 0 || k >= numTiles.x)
+			continue;
+		for (int l = j - range; l <= j + range; l++) {
+			if (l < 0 || l >= numTiles.y || (i == k && j == l))
+				continue;
+			if (tilesPrev[k][l].tileType == TileType::fire) {
+				count++;
+			}
+		}
+	}
+	return count;
+}
+
+void Level::spreadFire() {
+	// copy tiles to base fire spreading off previous state
+	for (int i = 0; i < numTiles.x; i++) {
+		for (int j = 0; j < numTiles.y; j++) {
+			tilesPrev[i][j] = tiles[i][j];
+		}
+	}
+
+
+	for (int i = 0; i < numTiles.x; i++) {
+		for (int j = 0; j < numTiles.y; j++) {
+			if (tilesPrev[i][j].tileType == TileType::fire)
+				continue;
+			int numNeighbors = checkNeighboringTiles(i, j, 1);
+			int numNeighborsEmber = checkNeighboringTiles(i, j, 10);
+			double chance = tileChance * numNeighbors;
+			double chanceEmber = emberChance * numNeighborsEmber;
+			double r = (double)rand() / RAND_MAX;
+			if (r < chance && tiles[i][j].tileType != TileType::water) {
+				tiles[i][j].tileType = TileType::fire;
+			}
+			r = (double)rand() / RAND_MAX;
+			if (r < chanceEmber && tiles[i][j].tileType != TileType::water) {
+				tiles[i][j].tileType = TileType::fire;
+			}
 		}
 	}
 }

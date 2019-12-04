@@ -41,6 +41,7 @@ public:
 
 	Point numTiles;
 	Tile** tiles;
+	Tile** tilesPrev;
 	int turnNum;
 
 	// spreadable water objects
@@ -62,4 +63,8 @@ public:
 	bool placeWater(Point position, Point direction);
 	void spreadWater();
 	void spreadFire();
+
+private:
+	int checkNeighboringTiles(int i, int j, int range);
+
 };
