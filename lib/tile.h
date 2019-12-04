@@ -8,10 +8,10 @@ enum class TileType {
 
 class Tile {
 public:
-	
+
 	float height;
 	TileType tileType;
-	
+
 	Tile();
 	Tile(float height, TileType tileType);
 
