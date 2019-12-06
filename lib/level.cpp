@@ -148,6 +148,11 @@ bool Level::placeUnit(UnitType unit, Point position, Point direction) {
 	return true;
 }
 
+bool Level::placeUnit(Unit unit) {
+	placeUnit(unit.type, unit.position, unit.direction);
+	return true;
+}
+
 bool Level::placeWater(Point position, Point direction) {
 
 	// check if can place water here
@@ -186,9 +191,34 @@ int Level::checkNeighboringTiles(int i, int j, int range) {
 	return count;
 }
 
+void Level::removeUnitAtIndex(int index) {
+	int i;
+	for (int i = index; i < numUnits - 1; i++) {
+		units[i] = units[i + 1];
+	}
+	numUnits--;
+}
+
+// removes unit at specified index
+void Level::killUnit(Point firePos) {
+	for (int u = 0; u < numUnits; u++) {
+		if (units[u].position == firePos) {
+			removeUnitAtIndex(u);
+		}
+	}
+}
+
+bool Level::moveUnit(int index, Point newPosition) {
+	// move unit by adding new unit and deleting old one
+	placeUnit(units[index].type, newPosition, units[index].direction);
+	removeUnitAtIndex(index);
+	return true;
+}
+
 void Level::spreadFire() {
 	int numNeighbors, numNeighborsEmber;
 	double chance, chanceEmber, r, rEmber;
+	bool spread;
 
 	// copy tiles to base fire spreading off previous state
 	for (int i = 0; i < numTiles.x; i++) {
@@ -208,7 +238,14 @@ void Level::spreadFire() {
 			r = (double)rand() / RAND_MAX;
 			rEmber = (double)rand() / RAND_MAX;
 			if ((r < chance || rEmber < chanceEmber) && tiles[i][j].tileType != TileType::water)
+				spread = true;
+			else
+				spread = false;
+
+			if (spread) {
 				tiles[i][j].tileType = TileType::fire;
+				killUnit({ (double)i, (double)j });
+			}
 		}
 	}
 }

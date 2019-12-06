@@ -20,4 +20,5 @@ Point operator/(const Point& p1, const double n);
 Point operator*(const double n, const Point& p1);
 Point operator/(const double n, const Point& p1);
 Point operator-(const Point& p1);
+bool operator==(const Point& p1, const Point& p2);
 std::ostream& operator<< (std::ostream& out, Point const& p);

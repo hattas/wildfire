@@ -12,8 +12,14 @@ using namespace std;
 // constants
 const int SCREEN_W = 800;
 const int SCREEN_H = 800;
-const int X = 40;
+const int X = 30;
 const int Y = 30;
+
+enum State {
+	getMoveType,
+	getMoveLocation,
+	getPlaceLocation
+};
 
 struct Render {
 	Point tileSize;
@@ -23,16 +29,21 @@ struct Render {
 
 Level level(X, Y);
 Render render;
+Unit newUnit;
+Point newDirection = { 1, 0 };
+State moveState = getMoveType;
 
 void initLevel() {
 	for (int i = 0; i < X; i++) {
 		for (int j = 0; j < Y; j++) {
-			level.tiles[i][j].tileType = TileType::grass;
+			if (i > 10 && i < 15 && j > 10 && j < 15)
+				level.tiles[i][j].tileType = TileType::fire;
+			else
+				level.tiles[i][j].tileType = TileType::grass;
 		}
 	}
 
-	level.tiles[10][10].tileType = TileType::fire;
-
+	/*
 	level.placeUnit(UnitType::truck, { 4, 7 }, { 1, 0 });
 	level.placeUnit(UnitType::truck, { 20, 4 }, { 0, 1 });
 	level.placeUnit(UnitType::truck, { 22, 25 }, { 0, -1 });
@@ -40,7 +51,7 @@ void initLevel() {
 
 	level.placeUnit(UnitType::heli, { 15, 15 }, { -1, 0 });
 
-	level.placeUnit(UnitType::boat, { 4, 15 }, { 1, 0 });
+	level.placeUnit(UnitType::boat, { 4, 15 }, { 1, 0 });\*/
 }
 
 void initRender() {
@@ -134,8 +145,16 @@ void renderUnits(void) {
 	Color color;
 	int u, i, j, iStart, iEnd, jStart, jEnd;
 	Unit unit;
-	for (u = 0; u < level.numUnits; u++) {
-		unit = level.units[u];
+	for (u = 0; u <= level.numUnits; u++) {
+
+		if (u == level.numUnits) {
+			unit = newUnit;
+			if (moveState != getMoveLocation)
+				break;
+		}
+		else
+			unit = level.units[u];
+
 		if (unit.direction.x) {
 			iStart = min(unit.position.x, unit.position.x - unit.size.x * unit.direction.x + unit.direction.x);
 			iEnd = max(unit.position.x, unit.position.x - unit.size.x * unit.direction.x + unit.direction.x);
@@ -148,10 +167,16 @@ void renderUnits(void) {
 			iStart = unit.position.x;
 			iEnd = unit.position.x + unit.size.x - 1;
 		}
-		cout << iStart << " " << iEnd << " " << jStart << " " << jEnd << endl;
 		for (i = iStart; i <= iEnd; i++) {
 			for (j = jStart; j <= jEnd; j++) {
-				color = Color::white;
+				if (u == level.numUnits)
+					color = Color::lightGreen;
+				else if (unit.type == UnitType::truck)
+					color = Color::white;
+				else if (unit.type == UnitType::boat)
+					color = Color::black;
+				else if (unit.type == UnitType::heli)
+					color = Color::yellow;
 				drawTile(i, j, color);
 			}
 		}
@@ -204,39 +229,92 @@ Point getTileIndexFromMousePosition(Point mouse) {
 }
 
 void myMouse(int button, int state, int x, int y) {
-	Point index;
+	Point index = getTileIndexFromMousePosition({ (double)x, (double)y });
 
-	// left button clicked
 	if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON) {
-		index = getTileIndexFromMousePosition({ (double)x, (double)y });
-		if (level.tiles[(int)index.x][(int)index.y].tileType == TileType::water)
-			level.tiles[(int)index.x][(int)index.y].tileType = TileType::grass;
-		else
-			level.tiles[(int)index.x][(int)index.y].tileType = TileType::water;
-	}
 
-	// right button clicked
-	if (state == GLUT_DOWN && button == GLUT_RIGHT_BUTTON) {
-		index = getTileIndexFromMousePosition({ (double)x, (double)y });
-		if (level.tiles[(int)index.x][(int)index.y].tileType == TileType::fire)
-			level.tiles[(int)index.x][(int)index.y].tileType = TileType::grass;
-		else
-			level.tiles[(int)index.x][(int)index.y].tileType = TileType::fire;
+		cout << "state=" << moveState << endl;
+
+		if (moveState == getMoveType) {
+			// left button clicked
+			for (int u = 0; u < level.numUnits; u++) {
+				if (level.units[u].position == index) {
+					newUnit = level.units[u];
+					level.removeUnitAtIndex(u);
+					moveState = getMoveLocation;
+					cout << "removing unit and moving it" << endl;
+					cout << moveState << endl;
+					glutPostRedisplay();
+					return;
+				}
+			}
+			cout << "no unit selected" << endl;
+		}
+		else if (moveState == getMoveLocation) {
+			cout << "adding the new unit at this location" << endl;
+			moveState = getMoveType;
+			newUnit.position = index;
+			level.placeUnit(newUnit);
+			level.spreadWater();
+			glutPostRedisplay();
+			level.spreadFire();
+			glutPostRedisplay();
+		}
+
 	}
 }
 
+void myMouseMotionPassive(int x, int y) {
+	Point index = getTileIndexFromMousePosition({ (double)x, (double)y });
+
+	if (moveState == getMoveLocation) {
+		cout << "moving around the new unit" << endl;
+		newUnit.position = index;
+		glutPostRedisplay();
+	}
+}
 
 void myKeyboard(unsigned char theKey, int mouseX, int mouseY) {
-	switch (theKey) {
-	case 's':
-		level.spreadWater();
-		glutPostRedisplay();
-		break;
-	case 'f':
-		level.spreadFire();
-		glutPostRedisplay();
-		break;
-	default: break;
+	Point index = getTileIndexFromMousePosition({ (double)mouseX, (double)mouseY });
+	cout << moveState << endl;
+
+	if (moveState == getMoveType) {
+		if (theKey == '1') {
+			cout << "adding new truck unit" << endl;
+			newUnit = Unit(UnitType::truck, index, newDirection);
+			moveState = getMoveLocation;
+			glutPostRedisplay();
+		}
+		else if (theKey == '2') {
+			cout << "adding new heli unit" << endl;
+			newUnit = Unit(UnitType::heli, index, newDirection);
+			moveState = getMoveLocation;
+			glutPostRedisplay();
+		}
+		else if (theKey == '3') {
+			cout << "adding new boat unit" << endl;
+			newUnit = Unit(UnitType::boat, index, newDirection);
+			moveState = getMoveLocation;
+			glutPostRedisplay();
+		}
+	}
+
+	else if (moveState == getMoveLocation) {
+		if (theKey == 'r') {
+			if (newUnit.direction == Point(1, 0)) {
+				newUnit.direction = { 0, 1 };
+			}
+			else if (newUnit.direction == Point(0, 1)) {
+				newUnit.direction = { -1, 0 };
+			}
+			else if (newUnit.direction == Point(-1, 0)) {
+				newUnit.direction = { 0, -1 };
+			}
+			else if (newUnit.direction == Point(0, -1)) {
+				newUnit.direction = { 1, 0 };
+			}
+			glutPostRedisplay();
+		}
 	}
 }
 
@@ -249,6 +327,7 @@ int main(int argc, char** argv) {
 
 	glutDisplayFunc(myDisplay);
 	glutMouseFunc(myMouse);
+	glutPassiveMotionFunc(myMouseMotionPassive);
 	glutKeyboardFunc(myKeyboard);
 
 	myInit();

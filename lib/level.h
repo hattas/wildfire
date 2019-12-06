@@ -60,11 +60,14 @@ public:
 	bool isGameLost();
 	bool isGameWon();
 	bool placeUnit(UnitType unit, Point position, Point direction);
+	bool placeUnit(Unit unit);
+	bool moveUnit(int index, Point newPosition);
 	bool placeWater(Point position, Point direction);
 	void spreadWater();
 	void spreadFire();
+	void removeUnitAtIndex(int index);
 
 private:
 	int checkNeighboringTiles(int i, int j, int range);
-
+	void killUnit(Point firePos);
 };
