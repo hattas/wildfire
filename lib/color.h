@@ -12,5 +12,6 @@ enum class Color {
 	yellow = 0xffeb3b,
 	black = 0,
 	white = 0xffffff,
-	blue = 0x03a9f4
+	blue = 0x03a9f4,
+	gray = 0x808080
 };

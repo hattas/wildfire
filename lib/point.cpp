@@ -50,10 +50,6 @@ Point operator-(const Point& p1) {
 	return Point(-p1.x, -p1.y);
 }
 
-bool operator==(const Point& p1, const Point& p2) {
-	return p1.x == p2.x && p1.y == p2.y;
-}
-
 std::ostream& operator<< (std::ostream& out, Point const& p) {
 	out << "(" << p.x << ", " << p.y << ")";
 	return out;
