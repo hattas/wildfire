@@ -1,0 +1,22 @@
+light 5 5 15 .5 .5 .5  !bright white light 
+
+maxRecursionDepth 6
+minTransparency 0.8
+minReflectivity 0.7
+
+def white {diffuse 1 1 1 ambient 0 0 0}
+def brown {diffuse .4 .2 0 ambient 0 0 0}
+
+ambient .7 .7 .7 !set material properties for all of the objects
+specular .8 .8 .8
+specularExponent 30
+
+def boat{
+	use brown
+	push  translate -.1 1.3 0  rotate 90 1 0 0 scale .05 .05 1 cylinder pop
+	use white
+	push translate -.45 .9 0 rotate 135 0 0 1 rotate -90 0 1 0 scale .025 .55 .55 cone pop
+	push translate -.05 .3 0 rotate 90 1 0 0 scale 1 .3 .2 cone pop
+}
+
+push use boat pop
